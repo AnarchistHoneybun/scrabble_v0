@@ -175,6 +175,9 @@ class ScrabbleGame:
     def start_game(self):
         """
         Start and play the game.
+
+        Returns:
+            tuple: Final scores of both players (player1_score, player2_score)
         """
         # First move must be played on center tile at (7,7)
         starting_player = self.players[self.current_player_idx]
@@ -303,7 +306,12 @@ class ScrabbleGame:
         self.current_player_idx = 1 - self.current_player_idx
 
     def _end_game(self):
-        """End the game and display final scores."""
+        """
+        End the game and display final scores.
+
+        Returns:
+            tuple: Final scores of both players (player1_score, player2_score)
+        """
         print("\n--- GAME OVER ---")
         print(f"Final Board:")
         print(self.board)
@@ -316,6 +324,9 @@ class ScrabbleGame:
         # Determine winner
         winner = max(self.players, key=lambda p: p.score)
         print(f"\n{winner.name} wins!")
+
+        # Return tuple of scores in player order (player1, player2)
+        return self.players[0].score, self.players[1].score
 
 
 # Run the game if script is executed directly

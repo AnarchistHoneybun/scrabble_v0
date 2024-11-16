@@ -4,10 +4,14 @@ from solver import SolveState
 from game import *
 from adversarial_player import AdversarialAIPlayer
 from dumb_human_player import DumbHumanPlayer
+from mcts_player import MCTSPlayer
+from conservative_player import ConservativeAIPlayer
 
-# ai_player1 = GreedyAIPlayer("Greedy AI")
-human_player = DumbHumanPlayer("Human")
+ai_player1 = GreedyAIPlayer("Greedy AI")
+# human_player = DumbHumanPlayer("Human")
+mcts_player = MCTSPlayer("MCTS AI", num_simulations=5)
+conservative_player = ConservativeAIPlayer("Conservative AI")
 ai_player2 = AdversarialAIPlayer("Adversary AI")
 
-game = ScrabbleGame(human_player, ai_player2)
+game = ScrabbleGame(conservative_player, ai_player2)
 game.start_game()

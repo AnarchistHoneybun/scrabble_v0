@@ -6,7 +6,7 @@ import statistics
 
 
 class TournamentManager:
-    def __init__(self, players: List, games_per_matchup: int = 10):
+    def __init__(self,self_matchup_players: List, players: List, games_per_matchup: int = 10):
         """
         Initialize tournament manager.
 
@@ -15,6 +15,7 @@ class TournamentManager:
             games_per_matchup: Number of games to play for each player pair
         """
         self.players = players
+        self.self_matchup_players = self_matchup_players
         self.games_per_matchup = games_per_matchup
         self.results = defaultdict(list)  # Store all game results
         self.player_stats = defaultdict(lambda: {
@@ -38,6 +39,30 @@ class TournamentManager:
         Returns:
             Dictionary containing tournament statistics
         """
+        # run matches between self matchups
+        for player1, player2 in self.self_matchup_players:
+            print(f"\nPlaying matches between {player1.name} and {player2.name}")
+
+            for game_num in range(self.games_per_matchup):
+                print(f"\nGame {game_num + 1}/{self.games_per_matchup}")
+
+                # Randomly decide who goes first
+                if random.random() < 0.5:
+                    p1, p2 = player1, player2
+                else:
+                    p1, p2 = player2, player1
+
+                score1, score2 = self.run_match(p1, p2)
+
+                # Store results with original player order
+                if p1 == player1:
+                    self.results[(player1.name, player2.name)].append((score1, score2))
+                    self._update_stats(player1.name, player2.name, score1, score2)
+                else:
+                    self.results[(player1.name, player2.name)].append((score2, score1))
+                    self._update_stats(player1.name, player2.name, score2, score1)
+
+
         # Run matches between all player pairs
         for i, player1 in enumerate(self.players):
             for j, player2 in enumerate(self.players[i + 1:], i + 1):
@@ -148,15 +173,22 @@ if __name__ == "__main__":
     from mcts_player import MCTSPlayer
     from conservative_player import ConservativeAIPlayer
 
+    self_matchup_players = [
+        (GreedyAIPlayer("Greedy AI"), GreedyAIPlayer("Greedy AI")),
+        (AdversarialAIPlayer("Adversarial AI"), AdversarialAIPlayer("Adversarial AI")),
+        (MCTSPlayer("MCTS AI", num_simulations=5), MCTSPlayer("MCTS AI", num_simulations=5)),
+        (ConservativeAIPlayer("Conservative AI"), ConservativeAIPlayer("Conservative AI"))
+    ]
+
     # Create players
     players = [
         GreedyAIPlayer("Greedy AI"),
         AdversarialAIPlayer("Adversarial AI"),
-        MCTSPlayer("MCTS AI", num_simulations=10),
+        MCTSPlayer("MCTS AI", num_simulations=5),
         ConservativeAIPlayer("Conservative AI")
     ]
 
     # Run tournament
-    tournament = TournamentManager(players, games_per_matchup=5)
+    tournament = TournamentManager(self_matchup_players,players, games_per_matchup=5)
     stats = tournament.run_tournament()
     tournament.print_results()
